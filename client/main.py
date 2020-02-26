@@ -4,7 +4,7 @@ from utils.database_utils import *
 
 class RootWindow:
 	def __init__(self, win):
-		self.title_text = Label(win, text = "Dengue Diagnosis Assistant").pack(side = TOP, pady = 10)
+		# self.title_text = Label(win, text = "Dengue Diagnosis Assistant").pack(side = TOP, pady = 10)
 		self.diagnose_button = Button(win, text="Diagnose", command = self.diagnose_window).pack(side = TOP, pady = 10)
 		self.records_button = Button(win, text="Records").pack(side = TOP, pady = 10)
 		self.settings_button = Button(win, text="Diagnose").pack(side = TOP, pady = 10)
@@ -28,12 +28,18 @@ class RootWindow:
 		
 		diagnosis_header.mainloop()
 
+class TemperatureWindow:
+	temperature = None
+
+	def __init__(self):
+		pass
+
 class DiagnosticsWindow:
 	name = None
 	diagnostics = {"symptoms": None, "temperature": None, "countries_visited": None}
 
 	def __init__(self, win):
-		self.title_text = Label(win, text = "New Diagnosis").grid(row = 0, column = 0, columnspan = 4, sticky = N, pady = 15)
+		# self.title_text = Label(win, text = "New Diagnosis").grid(row = 0, column = 0, columnspan = 4, sticky = N, pady = 15)
 
 		self.name_text = Label(win, text = "Name").grid(row = 1, column = 0, columnspan = 2, sticky = N+E+W, padx = win.winfo_reqwidth() / 5)
 		self.name_input = Entry(win).grid(row = 1, column = 2, columnspan = 2, sticky = N+E, padx = win.winfo_reqwidth() / 5)
