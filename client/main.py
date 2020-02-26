@@ -11,7 +11,7 @@ class RootWindow:
 	
 	def diagnose_window(self):
 		diagnosis_header = Tk()
-		diagnosis_win = DiagnosisWindow(diagnosis_header)
+		diagnosis_win = DiagnosticsWindow(diagnosis_header)
 
 		diagnosis_header.title("New Diagnosis")
 		diagnosis_header.geometry("600x350+10+10")
@@ -28,7 +28,7 @@ class RootWindow:
 		
 		diagnosis_header.mainloop()
 
-class DiagnosisWindow:
+class DiagnosticsWindow:
 	name = None
 	diagnostics = {"symptoms": None, "temperature": None, "countries_visited": None}
 
