@@ -61,22 +61,22 @@ class DiagnosticsWindow:
 		self.name_text = Label(win, text = "Name").grid(row = 1, column = 0, columnspan = 2, sticky = N+E+W, padx = win.winfo_reqwidth() / 5)
 		self.name_input = Entry(win).grid(row = 1, column = 2, columnspan = 2, sticky = N+E, padx = win.winfo_reqwidth() / 5)
 		
-		self.symptoms_prefix = Label(win, text = self.generate_prefix(win, "symptoms")).grid(row = 2, column = 0, sticky = N+W, padx = win.winfo_reqwidth() / 5)
+		self.symptoms_prefix = Label(win, text = self.generate_prefix("symptoms")).grid(row = 2, column = 0, sticky = N+W, padx = win.winfo_reqwidth() / 5)
 		self.symptoms_text = Label(win, text = "Symptoms").grid(row = 2, column = 1, sticky = N+W, padx = win.winfo_reqwidth() / 5)
-		self.symptoms_status = Label(win, text = self.generate_status(win, "symptoms")).grid(row = 2, column = 2, sticky = N+W, padx = win.winfo_reqwidth() / 5)
+		self.symptoms_status = Label(win, text = self.generate_status("symptoms")).grid(row = 2, column = 2, sticky = N+W, padx = win.winfo_reqwidth() / 5)
 		self.symptoms_edit = Button(win, text = "Edit").grid(row = 2, column = 3, sticky = N+W, padx = win.winfo_reqwidth() / 5)
 
-		self.temperature_prefix = Label(win, text = self.generate_prefix(win, "temperature")).grid(row = 3, column = 0, sticky = N+W, padx = win.winfo_reqwidth() / 5)
+		self.temperature_prefix = Label(win, text = self.generate_prefix("temperature")).grid(row = 3, column = 0, sticky = N+W, padx = win.winfo_reqwidth() / 5)
 		self.temperature_text = Label(win, text = "Temperature").grid(row = 3, column = 1, sticky = N+W, padx = win.winfo_reqwidth() / 5)
-		self.temperature_status = Label(win, text = self.generate_status(win, "temperature")).grid(row = 3, column = 2, sticky = N+W, padx = win.winfo_reqwidth() / 5)
+		self.temperature_status = Label(win, text = self.generate_status("temperature")).grid(row = 3, column = 2, sticky = N+W, padx = win.winfo_reqwidth() / 5)
 		self.temperature_edit = Button(win, text = "Edit").grid(row = 3, column = 3, sticky = N+W, padx = win.winfo_reqwidth() / 5)
 
-		self.countries_visited_prefix = Label(win, text = self.generate_prefix(win, "countries_visited")).grid(row = 4, column = 0, sticky = N+W, padx = win.winfo_reqwidth() / 5)
+		self.countries_visited_prefix = Label(win, text = self.generate_prefix("countries_visited")).grid(row = 4, column = 0, sticky = N+W, padx = win.winfo_reqwidth() / 5)
 		self.countries_visited_text = Label(win, text = "Cuntries Visited").grid(row = 4, column = 1, sticky = N+W, padx = win.winfo_reqwidth() / 5)
-		self.countries_visited_status = Label(win, text = self.generate_status(win, "countries_visited")).grid(row = 4, column = 2, sticky = N+W, padx = win.winfo_reqwidth() / 5)
+		self.countries_visited_status = Label(win, text = self.generate_status("countries_visited")).grid(row = 4, column = 2, sticky = N+W, padx = win.winfo_reqwidth() / 5)
 		self.countries_visited_edit = Button(win, text = "Edit").grid(row = 4, column = 3, sticky = N+W, padx = win.winfo_reqwidth() / 5)
 
-	def generate_prefix(self, win, diagnostic):
+	def generate_prefix(self, diagnostic):
 		if self.diagnostics[diagnostic] == None:
 			return ""
 		else:
@@ -87,7 +87,7 @@ class DiagnosticsWindow:
 			else:
 				return str(len(self.diagnostics[diagnostic])) + " Selected"
 			
-	def generate_status(self, win, diagnostic):
+	def generate_status(self, diagnostic):
 		if self.diagnostics[diagnostic] == None:
 			return "X"
 		else:
