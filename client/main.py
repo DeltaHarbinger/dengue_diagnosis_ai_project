@@ -32,9 +32,26 @@ class TemperatureWindow:
 	temperature = None
 
 	def __init__(self, win):
-		self.title_text = Label(win, text = "Enter Temperature in °C").grid(row = 0, column = 0, columnspan = 2, sticky = N, pady = win.winfo_reqwidth() / 10)
+		self.title_text = Label(win, text = "Enter Temperature in °C").grid(row = 0, column = 0, columnspan = 2, sticky = N, pady = (win.winfo_reqwidth() / 5, win.winfo_reqwidth() / 10))
+		self.temperature_celcius_entry = Entry(win).grid(row = 1, column = 0, sticky = N + W + E, pady = win.winfo_reqheight() / 10, padx = win.winfo_reqwidth() / 5)
+		self.temperature_celcius_label = Label(win, text = "°C").grid(row = 1, column = 1, sticky = N + W + E, pady = win.winfo_reqheight() / 10, padx = win.winfo_reqwidth() / 5)
+		self.temperature_celcius_label = Label(win, text = self.get_farenheit()).grid(row = 2, column = 0, sticky = N + W + E, pady = win.winfo_reqheight() / 10, padx = win.winfo_reqwidth() / 5)
+		self.temperature_celcius_label = Label(win, text = "°F").grid(row = 2, column = 1, sticky = N + W + E, pady = win.winfo_reqheight() / 10, padx = win.winfo_reqwidth() / 5)
+		self.store_temterature_button = Button(win, text = "OK", command = self.store_celcius)
+		
 
+	def store_celcius(self):
+		try:
+			self.temperature = self.temperature_celcius_entry.get()
+		except ValueError:
+			self.temperature = None
 
+	def get_farenheit(self):
+		try: 
+			return str(float(self.temperature * 1.8 + 32))
+		except ValueError:
+			return ""
+		
 class DiagnosticsWindow:
 	name = None
 	diagnostics = {"symptoms": None, "temperature": None, "countries_visited": None}
@@ -65,7 +82,7 @@ class DiagnosticsWindow:
 		else:
 			prefix = self.diagnostics[diagnostic]
 			if diagnostic == "temperature":
-				farenheit = int(self.diagnostics[diagnostic]) * 1.8 + 32
+				farenheit = float(self.diagnostics[diagnostic]) * 1.8 + 32
 				return self.diagnostics[diagnostic] + " °C | " + str(farenheit) + " °F"
 			else:
 				return str(len(self.diagnostics[diagnostic])) + " Selected"
