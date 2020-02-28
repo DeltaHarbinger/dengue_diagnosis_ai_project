@@ -41,11 +41,6 @@ class TemperatureWindow(Toplevel):
 		self.store_temterature_button = Button(self, text = "OK", command = self.on_ok)
 		
 		self.store_temterature_button.grid(row = 2, column = 0, columnspan = 2, sticky = N + W + E, pady = self.winfo_reqheight() / 10, padx = self.winfo_reqwidth() / 5)
-		
-		# self.temperature_celcius_entry.bind("<Button-1>", self.on_ok)
-		# self.temperature_celcius_entry.bind("<Return>", self.on_ok)
-	
-
 
 	def show(self):
 		self.wm_deiconify()
@@ -134,9 +129,6 @@ class DiagnosticsWindow(Frame):
 
 		self.temperature_prefix.config(text = self.generate_prefix("temperature"))
 		self.temperature_status.config(text = self.generate_status("temperature"))
-	
-	
-
 
 root_header = Tk()
 root_win = RootWindow(root_header)
