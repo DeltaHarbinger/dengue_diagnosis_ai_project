@@ -25,9 +25,7 @@ router.put('/', (req, res) => {
 	}
 	Object.keys(payload).forEach(key => payload[key] === undefined && delete payload[key])
 	Country.update(payload, {where: {id: payload.id}, returning: true})
-		.then(result => {
-			res.send({updates: result})
-		})
+		.then(result => res.send({updates: result}))
 		.catch(console.log)
 })
 
@@ -40,9 +38,7 @@ router.delete('/', (req, res) => {
 	Country.destroy({
 		where: {id: id},
 	})
-	.then(result => {
-		res.send({deletions: result})
-	})
+	.then(result => res.send({deletions: result}))
 	.catch(console.log)
 })
 

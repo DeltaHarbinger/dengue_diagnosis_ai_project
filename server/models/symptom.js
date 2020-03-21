@@ -1,18 +1,15 @@
 const Sequelize = require('sequelize')
 const db = require('../config/database')
 
-const Country = db.define('country', {
-	country_code: {
-		type: Sequelize.STRING
-	},
-	country_name: {
-		type: Sequelize.STRING
-	},
+const Symptom = db.define('symptom', {
 	id: {
 		type: Sequelize.INTEGER,
 		primaryKey: true,
 		autoIncrement: true
+	},
+	name: {
+		type: Sequelize.STRING
 	}
 })
 
-module.exports = Country
+module.exports = Symptom
