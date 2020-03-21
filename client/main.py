@@ -82,7 +82,38 @@ class TemperatureWindow(Toplevel):
 	def on_ok(self, event=None):
 		self.temperature = str(self.temperature_celcius_entry.get())
 		self.destroy()
+
+class CountriesVisitedWindow(Toplevel):
+	def __init__(self, win):
+		self.countries = [{"id": c["id"], "country_name": c["country_name"], "country_code": c["country_code"]} for c in get_all_countries()]
+		self.countries = sorted(self.countries, key = lambda c: (c["country_name"]))
+		self.selected = [BooleanVar() for x in self.countries]
 		
+		Toplevel.__init__(self, win)
+
+		self.build_country_rows(self.countries)
+
+		self.confirm_button = Button(self, text="Ok", command=self.destroy)
+		self.confirm_button.grid(row = len(self.countries), column = 0, columnspan = 2, sticky = N + W + E, pady = self.winfo_reqheight() / 10, padx = self.winfo_reqwidth() / 5)
+
+	def build_country_rows(self, countries):
+		for i, country in enumerate(self.countries):
+			self.build_country_selection(i, country)
+
+	def build_country_selection(self, i, country):
+		Label(self, text = country["country_name"]).grid(row = i, column = 0, pady = self.winfo_reqheight() / 10, padx = (self.winfo_reqwidth() / 10, self.winfo_reqwidth() / 2))
+		Checkbutton(self, command=lambda: self.toggle_selected(i)).grid(row = i, column = 1, pady = self.winfo_reqheight() / 10, padx = self.winfo_reqwidth() / 10)
+
+	def toggle_selected(self, i):
+		self.selected[i].set(not (self.selected[i].get()))
+
+	def show(self):
+		self.wm_deiconify()
+		self.wait_window()
+		print(self.selected)
+		print([country for i, country in enumerate(self.countries) if self.selected[i].get()])
+		return [country for i, country in enumerate(self.countries) if self.selected[i].get()]
+
 class DiagnosticsWindow(Frame):
 	name = None
 	diagnostics = {"symptoms": None, "temperature": None, "countries_visited": None}
@@ -98,6 +129,9 @@ class DiagnosticsWindow(Frame):
 		self.build_temperature_row(win)
 
 		self.build_countries_visited_row(win)
+
+		self.ok_button = Button(win, text="Diagnose", command=None)
+		self.ok_button.grid(row = 5, column = 1, columnspan=2, sticky = N + W + E, pady = win.winfo_reqheight() / 10)
 		
 	def build_symptoms_row(self, win):
 		self.symptoms_prefix = Label(win, text = self.generate_prefix("symptoms"))
@@ -135,7 +169,7 @@ class DiagnosticsWindow(Frame):
 		self.countries_visited_status = Label(win, text = self.generate_status("countries_visited"))
 		self.countries_visited_status.grid(row = 4, column = 2, sticky = N+W, padx = win.winfo_reqwidth() / 5)
 		
-		self.countries_visited_edit = Button(win, text = "Edit")
+		self.countries_visited_edit = Button(win, text = "Edit", command = self.get_countries)
 		self.countries_visited_edit.grid(row = 4, column = 3, sticky = N+W, padx = win.winfo_reqwidth() / 5)
 
 	def generate_prefix(self, diagnostic):
@@ -166,6 +200,14 @@ class DiagnosticsWindow(Frame):
 
 		self.temperature_prefix.config(text = self.generate_prefix("temperature"))
 		self.temperature_status.config(text = self.generate_status("temperature"))
+
+	def get_countries(self):
+		self.diagnostics["countries_visited"] = CountriesVisitedWindow(self).show()
+
+		self.countries_visited_prefix.config(text = self.generate_prefix("countries_visited"))
+		self.countries_visited_status.config(text = self.generate_status("countries_visited"))
+	
+
 
 root_header = Tk()
 root_win = RootWindow(root_header)
