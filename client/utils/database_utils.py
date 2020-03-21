@@ -48,4 +48,4 @@ def delete_symptom(id):
 	return response.json()
 
 if __name__ == '__main__':
-	print(delete_symptom(4))
+	pass
