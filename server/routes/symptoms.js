@@ -25,7 +25,7 @@ router.put('/', (req, res) => {
 	}
 	Object.keys(payload).forEach(key => payload[key] === undefined && delete payload[key])
 	Symptom.update(payload, {where: {id: payload.id}, returning: true})
-		.then(result => res.send(result))
+		.then(result => res.send({updates: result}))
 		.catch(console.log)
 })
 
