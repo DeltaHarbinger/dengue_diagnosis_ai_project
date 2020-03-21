@@ -29,29 +29,35 @@ class RootWindow:
 		diagnosis_header.mainloop()
 
 class SymptomsWindow(Toplevel):
-	symptoms = [{"id": 0, "name": "Joint Pains", "priority": 0}, {"id": 2, "name": "Fatigue", "priority": 1}, {"id": 4, "name": "Vomiting", "priority": 1}, {"id": 3, "name": "Nausea", "priority": 1}, {"id": 1, "name": "High Fever", "priority": 0}]
-	selected = []
 
 	def __init__(self, win):
+		self.symptoms = [{"id": s["id"], "name": s["name"]} for s in get_all_symptoms()]
+		self.symptoms = sorted(self.symptoms, key = lambda s: (s["name"]))
+		self.selected = [BooleanVar() for x in self.symptoms]
+		
 		Toplevel.__init__(self, win)
 
 		self.build_symptom_rows(self.symptoms)
 
-	def build_symptom_rows(self, symptoms):
-		sorted_symptoms = sorted(self.symptoms, key = lambda s: (s["priority"], s["name"]))
+		self.confirm_button = Button(self, text="Ok", command=self.destroy)
+		self.confirm_button.grid(row = len(self.symptoms), column = 0, columnspan = 2, sticky = N + W + E, pady = self.winfo_reqheight() / 10, padx = self.winfo_reqwidth() / 5)
 
-		for i, symptom in enumerate(sorted_symptoms):
+
+	def build_symptom_rows(self, symptoms):
+		for i, symptom in enumerate(self.symptoms):
 			self.build_symptom_selection(i, symptom)
 
 	def build_symptom_selection(self, i, symptom):
 		Label(self, text = symptom["name"]).grid(row = i, column = 0, pady = self.winfo_reqheight() / 10, padx = (self.winfo_reqwidth() / 10, self.winfo_reqwidth() / 2))
-		Checkbutton(self).grid(row = i, column = 1, pady = self.winfo_reqheight() / 10, padx = self.winfo_reqwidth() / 10)
+		Checkbutton(self, command=lambda: self.toggle_selected(i)).grid(row = i, column = 1, pady = self.winfo_reqheight() / 10, padx = self.winfo_reqwidth() / 10)
+
+	def toggle_selected(self, i):
+		self.selected[i].set(not (self.selected[i].get()))
 
 	def show(self):
 		self.wm_deiconify()
 		self.wait_window()
-
-
+		return [symptom for i, symptom in enumerate(self.symptoms) if self.selected[i].get()]
 
 class TemperatureWindow(Toplevel):
 
@@ -150,7 +156,10 @@ class DiagnosticsWindow(Frame):
 			return "✓"
 
 	def get_symptoms(self):
-		SymptomsWindow(self).show()
+		self.diagnostics["symptoms"] = SymptomsWindow(self).show()
+		
+		self.symptoms_prefix.config(text = self.generate_prefix("symptoms"))
+		self.symptoms_status.config(text = self.generate_status("symptoms"))
 
 	def get_temperature(self):
 		self.diagnostics["temperature"] = TemperatureWindow(self).show()
