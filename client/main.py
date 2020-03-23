@@ -130,7 +130,7 @@ class DiagnosticsWindow(Frame):
 
 		self.build_countries_visited_row(win)
 
-		self.ok_button = Button(win, text="Diagnose", command=None)
+		self.ok_button = Button(win, text="Diagnose", command=self.submit_diagnosis)
 		self.ok_button.grid(row = 5, column = 1, columnspan=2, sticky = N + W + E, pady = win.winfo_reqheight() / 10)
 		
 	def build_symptoms_row(self, win):
@@ -206,6 +206,10 @@ class DiagnosticsWindow(Frame):
 
 		self.countries_visited_prefix.config(text = self.generate_prefix("countries_visited"))
 		self.countries_visited_status.config(text = self.generate_status("countries_visited"))
+
+	def submit_diagnosis(self):
+
+		pass
 	
 
 
