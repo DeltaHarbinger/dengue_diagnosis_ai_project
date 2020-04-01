@@ -14,6 +14,13 @@ app.use('/countries', require('./routes/countries'))
 
 app.use('/symptoms', require('./routes/symptoms'))
 
+app.use('/diagnoses', require('./routes/diagnoses'))
+
+app.use('/diagnosis_symptoms', require('./routes/diagnosis_symptoms'))
+
+app.use('/diagnosis_countries', require('./routes/diagnosis_countries'))
+
+
 const PORT = process.env.PORT || 5000
 
 app.listen(PORT, console.log(`App on port ${PORT}`)) 

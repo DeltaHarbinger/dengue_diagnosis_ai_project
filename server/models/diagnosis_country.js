@@ -1,13 +1,13 @@
 const Sequelize = require("sequelize")
 const db = require("../config/database")
 
-const DiagnosisSymptom = db.define('diagnosis_symptom', {
+const DiagnosisCountry = db.define('diagnosis_country', {
 	diagnosisId: {
 		type: Sequelize.INTEGER
 	},
-	symptomId: {
+	countryId: {
 		type: Sequelize.INTEGER
 	}
 })
 
-module.exports = DiagnosisSymptom
+module.exports = DiagnosisCountry
