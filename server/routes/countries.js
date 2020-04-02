@@ -3,12 +3,38 @@ const router = express.Router()
 
 const db = require('../config/database')
 const Country = require('../models/country')
+const Diagnosis = require('../models/diagnosis')
+const DiagnosisCountry = require('../models/diagnosis_country')
 
 router.get('/', (req, res) => 
 	Country.findAll()
 		.then(countries => res.send({countries}))
 		.catch(console.log)
 )
+
+router.get('/probability', async (req, res) => {
+	let {countryIds} = req.body
+	let likelihood = 0
+
+	await Promise.all(countryIds.map(async countryId => {
+		let diagnosisCountries = await DiagnosisCountry.findAll({where: {countryId}})
+		let total = diagnosisCountries.length
+		let positive = 0
+		await Promise.all(diagnosisCountries.map(async dc => {
+			let diagnosis = await Diagnosis.findOne({where: {id: dc.diagnosisId}})
+			if(diagnosis.result > 50){
+				positive += 1
+			}
+		}))
+		if(total == 0) {
+			return
+		}
+		if(positive / total > likelihood) {
+			likelihood = positive / total
+		}
+	}))
+	res.send({probability: likelihood})
+})
 
 router.post('/', (req, res) => {
 	let {country_code, country_name} = req.body
@@ -38,8 +64,8 @@ router.delete('/', (req, res) => {
 	Country.destroy({
 		where: {id: id},
 	})
-	.then(result => res.send({deletions: result}))
-	.catch(console.log)
+		.then(result => res.send({deletions: result}))
+		.catch(console.log)
 })
 
 module.exports = router
