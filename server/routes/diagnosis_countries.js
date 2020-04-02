@@ -5,6 +5,18 @@ const db = require('../config/database')
 const DiagnosisCountry = require("../models/diagnosis_country")
 
 router.get('/', (req, res) => {
+	let {diagnosisId, countryId} = req.query
+	if(diagnosisId) {
+		DiagnosisCountry.findAll({where: {diagnosisId}})
+			.then(diagnosis_countries => res.send({diagnosis_countries}))
+			.catch(console.log)
+		return
+	}
+	if(countryId) {
+		DiagnosisCountry.findAll({where: {countryId}})
+			.then(diagnosis_countries => res.send({diagnosis_countries}))
+			.catch(console.log)
+	}
 	DiagnosisCountry.findAll()
 		.then(diagnosis_countries => res.send({diagnosis_countries}))
 		.catch(console.log)
@@ -27,6 +39,8 @@ router.delete('/', (req, res) => {
 			countryId: countryId
 		}
 	})
+		.then(result => res.send({deletions:result}))
+		.catch(console.log)
 })
 
 module.exports = router
