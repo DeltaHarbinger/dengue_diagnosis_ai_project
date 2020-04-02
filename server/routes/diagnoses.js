@@ -54,6 +54,8 @@ router.put('/', (req, res) => {
 router.delete('/', (req, res) => {
 	let {id} = req.body
 	Diagnosis.destroy({where: {id: id}})
+		.then(result => res.send({deletions:result}))
+		.catch(console.log)
 })
 
 module.exports = router
