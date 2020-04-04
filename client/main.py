@@ -112,9 +112,95 @@ class CountriesVisitedWindow(Toplevel):
 		self.wait_window()
 		return [country for i, country in enumerate(self.countries) if self.selected[i].get()]
 
+class DiagnosisResultWindow(Toplevel):
+	def __init__(self, win, id):
+		Toplevel.__init__(self, win)
+		self.diagnosis_info = get_diagnosis(id)
+		print(self.diagnosis_info)
+		self.display_result()
+	
+	def display_result(self):
+		name = self.diagnosis_info["name"]
+		id = self.diagnosis_info["id"]
+
+		all_symptoms = get_all_symptoms()
+
+		all_countries = get_all_countries()
+
+		# print("_____________________")
+		# print(all_symptoms)
+		# print("_____________________")
+		# print(all_countries)
+		# print("_____________________")
+
+		self.title = Label(self, text="{}\nDiagnosis ID:{}".format(name, id))
+		self.title.grid(row=0, column=0, columnspan=2, pady= self.winfo_reqheight() / 10, padx= self.winfo_reqwidth() / 10)
+
+		self.symptom_ids = [symptom["symptomId"] for symptom in self.diagnosis_info["symptoms"]]
+		# print(self.symptom_ids)
+		# print("_________________")
+		self.country_ids = [country["countryId"] for country in self.diagnosis_info["countries"]]
+		# print(self.country_ids)
+		# print("_________________")
+		self.countries_info = self.diagnosis_info["countries"]
+		
+		self.temperature = self.diagnosis_info["temperature"]
+		self.result = self.diagnosis_info["result"]
+
+		self.symptoms_names = [symptom["name"] for symptom in all_symptoms if symptom["id"] in self.symptom_ids]
+		self.country_names = [country["country_name"] for country in all_countries if country["id"] in self.country_ids]
+
+		self.build_temperature_row()
+		self.build_symptoms_row()
+		self.build_countries_row()
+		self.build_date_row()
+		self.build_result_row()
+
+		self.ok = Button(self, text="Okay", command=self.destroy, pady=self.winfo_reqheight() / 20)
+		self.ok.grid(row=6, column=0, columnspan=2)
+
+	def build_temperature_row(self):
+		self.temperature_text = Label(self, text="Temperature")
+		self.temperature_value = Label(self, text="{} °C".format(str(self.diagnosis_info["temperature"])))
+
+		self.temperature_text.grid(row=1, column=0, pady= self.winfo_reqheight() / 20, padx= self.winfo_reqwidth() / 2)
+		self.temperature_value.grid(row=1, column=1, pady= self.winfo_reqheight() / 20, padx= self.winfo_reqwidth() / 2)
+
+	def build_symptoms_row(self):
+		self.symptoms_text = Label(self, text="Symptoms")
+		self.symptoms_list = Label(self, text="\n".join(self.symptoms_names))
+
+		self.symptoms_text.grid(row=2, column=0, pady= self.winfo_reqheight() / 20, padx= self.winfo_reqwidth() / 2)
+		self.symptoms_list.grid(row=2, column=1, pady= self.winfo_reqheight() / 20, padx= self.winfo_reqwidth() / 2)
+
+	def build_countries_row(self):
+		self.countries_text = Label(self, text="Countries")
+		self.countries_list = Label(self, text="\n".join(self.country_names))
+
+		self.countries_text.grid(row=3, column=0, pady= self.winfo_reqheight() / 20, padx= self.winfo_reqwidth() / 2)
+		self.countries_list.grid(row=3, column=1, pady= self.winfo_reqheight() / 20, padx= self.winfo_reqwidth() / 2)
+
+	def build_date_row(self):
+		self.date_text = Label(self, text="Date")
+		self.date_value = Label(self, text="{}".format(self.diagnosis_info["createdAt"]))
+
+		self.date_text.grid(row=4, column=0, pady= self.winfo_reqheight() / 20, padx= self.winfo_reqwidth() / 2)
+		self.date_value.grid(row=4, column=1, pady= self.winfo_reqheight() / 20, padx= self.winfo_reqwidth() / 2)
+
+	def build_result_row(self):
+		self.result_text = Label(self, text="Result")
+		self.result_value = Label(self, text="{}%".format(self.diagnosis_info["result"]))
+
+		self.result_text.grid(row=5, column=0, pady= self.winfo_reqheight() / 20, padx= self.winfo_reqwidth() / 2)
+		self.result_value.grid(row=5, column=1, pady= self.winfo_reqheight() / 20, padx= self.winfo_reqwidth() / 2)
+
+
+	def show(self):
+		self.wm_deiconify()
+		self.wait_window()
+
 class DiagnosticsWindow(Frame):
 	
-
 	def __init__(self, win):
 		Frame.__init__(self, win)
 		self.name = None
@@ -242,11 +328,16 @@ class DiagnosticsWindow(Frame):
 		if success:
 			self.final_diagnosis = int((country_probability + symptom_probability + temperature_probability) / 3 * 100)
 			result = add_diagnosis(self.name, self.diagnostics["temperature"], self.final_diagnosis, country_ids, symptom_ids)
-			print("Result {}".format(result))
+			DiagnosisResultWindow(self, result["id"])
 
 	def submit_diagnosis(self):
 		self.name = self.name_input.get()
 		self.diagnose_patient()
+
+class RecordsWindow(Frame):
+
+	def __init__(self, win):
+		Frame.__init__(self, win)
 
 root_header = Tk()
 root_win = RootWindow(root_header)
