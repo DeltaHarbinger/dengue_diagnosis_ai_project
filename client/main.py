@@ -119,6 +119,7 @@ class DiagnosticsWindow(Frame):
 		Frame.__init__(self, win)
 		self.name = None
 		self.diagnostics = {"symptoms": None, "temperature": None, "countries_visited": None}
+		self.final_diagnosis = None
 
 		self.name_text = Label(win, text = "Name").grid(row = 1, column = 0, columnspan = 2, sticky = N+E+W, padx = win.winfo_reqwidth() / 5)
 		self.name_input = Entry(win)
@@ -215,34 +216,37 @@ class DiagnosticsWindow(Frame):
 		country_probability = 0
 		symptom_probability = 0
 		temperature_probability = 0
-		
-		if self.diagnostics["countries_visited"] != None and self.diagnostics["countries_visited"] != []:
-			country_ids = [country["id"] for country in self.diagnostics["countries_visited"]]
-			country_probability = get_country_probability(country_ids)["probability"]
-		
-		if self.diagnostics["symptoms"] != None and self.diagnostics["symptoms"] != []:
-			symptom_ids = [symptom["id"] for symptom in self.diagnostics["symptoms"]]
-			symptom_probability = get_symptom_probability(symptom_ids)["probability"]
-		
-		if(self.diagnostics["temperature"] != None):
-			if self.diagnostics["temperature"] > 37:
-				temperature_probability = 0.5
-			elif self.diagnostics["temperature"] > 40:
-				temperature_probability = 1
 
-		# print("Country Probability {}".format(country_probability))
-		# print("Symptom Probability {}".format(symptom_probability))
-		# print("Temperature Probability {}".format(temperature_probability))
-		# print("---")
-		final_diagnosis = (country_probability + symptom_probability + temperature_probability) / 3
-		print("Overall {}%".format(int(final_diagnosis * 100)))
+		success = True
+		
+		try:
+
+			if self.diagnostics["countries_visited"] != None and self.diagnostics["countries_visited"] != []:
+				country_ids = [country["id"] for country in self.diagnostics["countries_visited"]]
+				country_probability = get_country_probability(country_ids)
+			
+			if self.diagnostics["symptoms"] != None and self.diagnostics["symptoms"] != []:
+				symptom_ids = [symptom["id"] for symptom in self.diagnostics["symptoms"]]
+				symptom_probability = get_symptom_probability(symptom_ids)
+			
+			if(self.diagnostics["temperature"] != None):
+				if self.diagnostics["temperature"] > 37:
+					temperature_probability = 0.5
+				elif self.diagnostics["temperature"] > 40:
+					temperature_probability = 1
+
+		except Exception as e:
+			success = False
+			print(e)
+		
+		if success:
+			self.final_diagnosis = int((country_probability + symptom_probability + temperature_probability) / 3 * 100)
+			result = add_diagnosis(self.name, self.diagnostics["temperature"], self.final_diagnosis, country_ids, symptom_ids)
+			print("Result {}".format(result))
 
 	def submit_diagnosis(self):
 		self.name = self.name_input.get()
 		self.diagnose_patient()
-		
-	
-
 
 root_header = Tk()
 root_win = RootWindow(root_header)
