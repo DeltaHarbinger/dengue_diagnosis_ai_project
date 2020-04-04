@@ -10,7 +10,7 @@ def get_all_countries():
 def get_country_probability(countryIds):
 	body = {"countryIds": countryIds}
 	response = requests.get("{}/countries/probability".format(ROOT_URL), data=body)
-	return response.json()
+	return response.json()["probability"]
 
 def add_country(country_name, country_code):
 	body = {"country_name": country_name, "country_code": country_code}
@@ -38,7 +38,7 @@ def get_all_symptoms():
 def get_symptom_probability(symptomIds):
 	body = {"symptomIds": symptomIds}
 	response = requests.get("{}/symptoms/probability".format(ROOT_URL), data=body)
-	return response.json()
+	return response.json()["probability"]
 
 def add_symptom(name):
 	body = {"name": name}
@@ -56,6 +56,25 @@ def update_symptom(id, name=None):
 def delete_symptom(id):
 	body = {"id": id}
 	response = requests.delete("{}/symptoms".format(ROOT_URL), data=body)
+	return response.json()
+
+def get_diagnosis(id):
+	print("{}/diagnoses?id={}".format(ROOT_URL, id))
+	response = requests.get("{}/diagnoses?id={}".format(ROOT_URL, id))
+	return response.json()["diagnosis"]
+
+def get_all_diagnoses():
+	response = requests.get("{}/diagnoses".format(ROOT_URL))
+	return response.json()["diagnoses"]
+
+def add_diagnosis(name, temperature, result, countryIds, symptomIds):
+	body = {"name": name, "temperature": temperature, "result": result, "countryIds": countryIds, "symptomIds": symptomIds}
+	response = requests.post("{}/diagnoses".format(ROOT_URL), data=body)
+	return response.json()
+
+def delete_diagnosis(id):
+	body = {"id": id}
+	response = requests.delete("{}/diagnoses".format(ROOT_URL), data=body)
 	return response.json()
 
 if __name__ == '__main__':
