@@ -1,10 +1,16 @@
 import requests
+import json
 
 ROOT_URL = "http://localhost:5000"
 
 def get_all_countries():
 	response = requests.get("{}/countries".format(ROOT_URL))
 	return response.json()["countries"]
+
+def get_country_probability(countryIds):
+	body = {"countryIds": countryIds}
+	response = requests.get("{}/countries/probability".format(ROOT_URL), data=body)
+	return response.json()
 
 def add_country(country_name, country_code):
 	body = {"country_name": country_name, "country_code": country_code}
@@ -28,6 +34,11 @@ def delete_country(id):
 def get_all_symptoms():
 	response = requests.get("{}/symptoms".format(ROOT_URL))
 	return response.json()["symptoms"]
+
+def get_symptom_probability(symptomIds):
+	body = {"symptomIds": symptomIds}
+	response = requests.get("{}/symptoms/probability".format(ROOT_URL), data=body)
+	return response.json()
 
 def add_symptom(name):
 	body = {"name": name}
