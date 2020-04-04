@@ -13,16 +13,19 @@ router.get('/', async (req, res) => {
 		let symptoms = await DiagnosisSymptom.findAll({where: {diagnosisId: id}})
 		let countries = await DiagnosisCountry.findAll({where: {diagnosisId: id}})
 
-		Diagnosis.findAll({
+		Diagnosis.findOne({
 			where: {
 				id: id
 			}
 		})
-			.then(diagnoses => res.send({
-				...diagnoses,
-				symptoms,
-				countries
-			}))
+			.then(diagnosis => {
+				let data = diagnosis.dataValues
+				data.symptoms = symptoms
+				data.countries = countries
+				res.send({
+					diagnosis: data
+				})
+			})
 			.catch(console.log)
 	} else {
 		Diagnosis.findAll()
