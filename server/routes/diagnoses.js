@@ -32,11 +32,27 @@ router.get('/', async (req, res) => {
 	
 })
 
-router.post('/', (req, res) => {
-	let {name, result, temperature} = req.body
-	Diagnosis.create({name, result, temperature})
-		.then(result => res.send(result.dataValues))
+router.post('/', async (req, res) => {
+	let {name, result, temperature, symptomIds, countryIds} = req.body
+	let diagnosisResult = null
+	await Diagnosis.create({name, result, temperature})
+		.then(result => {
+			res.send(result.dataValues)
+			diagnosisResult = result.dataValues
+		})
 		.catch(console.log)
+	if(diagnosisResult.id !== undefined) {
+		if(Array.isArray(symptomIds)) {
+			symptomIds.forEach(symptomId => {
+				DiagnosisSymptom.create({diagnosisId: diagnosisResult.id, symptomId})
+			})
+		}
+		if(Array.isArray(countryIds)) {
+			countryIds.forEach(countryId => {
+				DiagnosisCountry.create({diagnosisId: diagnosisResult.id, countryId})
+			})
+		}
+	}
 })
 
 router.put('/', (req, res) => {
