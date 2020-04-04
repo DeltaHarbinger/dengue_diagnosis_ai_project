@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import ttk
 
 from utils.database_utils import *
 
@@ -6,9 +7,17 @@ class RootWindow:
 	def __init__(self, win):
 		
 		self.diagnose_button = Button(win, text="Diagnose", command = self.diagnose_window).pack(side = TOP, pady = (win.winfo_reqheight() / 5, win.winfo_reqheight() / 10))
-		self.records_button = Button(win, text="Records").pack(side = TOP, pady = win.winfo_reqheight() / 10)
+		self.records_button = Button(win, text="Records", command = self.records_window).pack(side = TOP, pady = win.winfo_reqheight() / 10)
 		self.settings_button = Button(win, text="Diagnose").pack(side = TOP, pady = win.winfo_reqheight() / 10)
 	
+	def records_window(self):
+		records_header = Tk()
+		records_win = RecordsWindow(records_header)
+		records_header.title("Diagnosis Records")
+		records_header.geometry("800x400+10+10")
+
+		records_header.mainloop()
+
 	def diagnose_window(self):
 		diagnosis_header = Tk()
 		diagnosis_win = DiagnosticsWindow(diagnosis_header)
@@ -116,7 +125,6 @@ class DiagnosisResultWindow(Toplevel):
 	def __init__(self, win, id):
 		Toplevel.__init__(self, win)
 		self.diagnosis_info = get_diagnosis(id)
-		print(self.diagnosis_info)
 		self.display_result()
 	
 	def display_result(self):
@@ -127,21 +135,11 @@ class DiagnosisResultWindow(Toplevel):
 
 		all_countries = get_all_countries()
 
-		# print("_____________________")
-		# print(all_symptoms)
-		# print("_____________________")
-		# print(all_countries)
-		# print("_____________________")
-
 		self.title = Label(self, text="{}\nDiagnosis ID:{}".format(name, id))
 		self.title.grid(row=0, column=0, columnspan=2, pady= self.winfo_reqheight() / 10, padx= self.winfo_reqwidth() / 10)
 
 		self.symptom_ids = [symptom["symptomId"] for symptom in self.diagnosis_info["symptoms"]]
-		# print(self.symptom_ids)
-		# print("_________________")
 		self.country_ids = [country["countryId"] for country in self.diagnosis_info["countries"]]
-		# print(self.country_ids)
-		# print("_________________")
 		self.countries_info = self.diagnosis_info["countries"]
 		
 		self.temperature = self.diagnosis_info["temperature"]
@@ -338,6 +336,41 @@ class RecordsWindow(Frame):
 
 	def __init__(self, win):
 		Frame.__init__(self, win)
+		self.diagnoses = get_all_diagnoses()
+
+		self.record_view = Canvas(win)
+		self.scroll_bar = Scrollbar(win, command=self.record_view.yview)
+		self.record_list = Frame(self.record_view)
+
+		self.delete_buttons = []
+		self.view_buttons = []
+
+		self.build_records(win)
+		
+		self.record_view.create_window(0, 0, anchor='nw', window=self.record_list)		
+		self.record_view.update_idletasks()
+		self.record_view.configure(yscrollcommand=self.scroll_bar.set, scrollregion=self.record_view.bbox('all'))
+		self.record_view.pack(side=LEFT, fill=BOTH, expand=True)
+
+		self.scroll_bar.pack(side=RIGHT, fill=Y)
+
+	def build_records(self, win):
+		for i, diagnosis in enumerate(self.diagnoses):
+			self.build_row(win, i, diagnosis)
+	
+	def delete_record(self, id, num):
+		delete_diagnosis(id)
+		self.delete_buttons[num].config(state='disabled')
+		self.view_buttons[num].config(state='disabled')
+
+	def build_row(self, win, num, diagnosis):
+		Label(self.record_list, text=diagnosis["name"]).grid(row=num * 2, column=0, padx=win.winfo_reqwidth() / 3)
+		Label(self.record_list, text=diagnosis["createdAt"]).grid(row=num * 2, column=1)
+		self.view_buttons.append(Button(self.record_list, text="View", command=lambda: DiagnosisResultWindow(win, diagnosis["id"])))
+		self.view_buttons[-1].grid(row=num * 2, column=2, sticky=E, padx = (50, 25))
+		self.delete_buttons.append(Button(self.record_list, text="Delete", command=lambda: self.delete_record(diagnosis["id"], num)))
+		self.delete_buttons[-1].grid(row=num * 2, column=3, sticky=E, padx = (25, 0))
+		ttk.Separator(self.record_list, orient=HORIZONTAL).grid(row=num * 2 + 1, column = 0, columnspan=4, sticky = E + W)
 
 root_header = Tk()
 root_win = RootWindow(root_header)
