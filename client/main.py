@@ -110,19 +110,19 @@ class CountriesVisitedWindow(Toplevel):
 	def show(self):
 		self.wm_deiconify()
 		self.wait_window()
-		print(self.selected)
-		print([country for i, country in enumerate(self.countries) if self.selected[i].get()])
 		return [country for i, country in enumerate(self.countries) if self.selected[i].get()]
 
 class DiagnosticsWindow(Frame):
-	name = None
-	diagnostics = {"symptoms": None, "temperature": None, "countries_visited": None}
+	
 
 	def __init__(self, win):
 		Frame.__init__(self, win)
+		self.name = None
+		self.diagnostics = {"symptoms": None, "temperature": None, "countries_visited": None}
 
 		self.name_text = Label(win, text = "Name").grid(row = 1, column = 0, columnspan = 2, sticky = N+E+W, padx = win.winfo_reqwidth() / 5)
-		self.name_input = Entry(win).grid(row = 1, column = 2, columnspan = 2, sticky = N+E, padx = win.winfo_reqwidth() / 5)
+		self.name_input = Entry(win)
+		self.name_input.grid(row = 1, column = 2, columnspan = 2, sticky = N+E, padx = win.winfo_reqwidth() / 5)
 		
 		self.build_symptoms_row(win)
 
@@ -163,7 +163,7 @@ class DiagnosticsWindow(Frame):
 		self.countries_visited_prefix = Label(win, text = self.generate_prefix("countries_visited"))
 		self.countries_visited_prefix.grid(row = 4, column = 0, sticky = N+W, padx = win.winfo_reqwidth() / 5)
 		
-		self.countries_visited_text = Label(win, text = "Cuntries Visited")
+		self.countries_visited_text = Label(win, text = "Countries Visited")
 		self.countries_visited_text.grid(row = 4, column = 1, sticky = N+W, padx = win.winfo_reqwidth() / 5)
 		
 		self.countries_visited_status = Label(win, text = self.generate_status("countries_visited"))
@@ -179,7 +179,7 @@ class DiagnosticsWindow(Frame):
 			prefix = self.diagnostics[diagnostic]
 			if diagnostic == "temperature":
 				farenheit = float(self.diagnostics[diagnostic]) * 1.8 + 32
-				return self.diagnostics[diagnostic] + " °C | " + ("%.2f" % farenheit ) + " °F"
+				return str(self.diagnostics[diagnostic]) + " °C | " + ("%.2f" % farenheit ) + " °F"
 			else:
 				return str(len(self.diagnostics[diagnostic])) + " Selected"
 			
@@ -196,10 +196,11 @@ class DiagnosticsWindow(Frame):
 		self.symptoms_status.config(text = self.generate_status("symptoms"))
 
 	def get_temperature(self):
-		self.diagnostics["temperature"] = TemperatureWindow(self).show()
+		self.diagnostics["temperature"] = int(TemperatureWindow(self).show())
 
 		self.temperature_prefix.config(text = self.generate_prefix("temperature"))
 		self.temperature_status.config(text = self.generate_status("temperature"))
+
 
 	def get_countries(self):
 		self.diagnostics["countries_visited"] = CountriesVisitedWindow(self).show()
@@ -207,9 +208,39 @@ class DiagnosticsWindow(Frame):
 		self.countries_visited_prefix.config(text = self.generate_prefix("countries_visited"))
 		self.countries_visited_status.config(text = self.generate_status("countries_visited"))
 
-	def submit_diagnosis(self):
+	def diagnose_patient(self):
+		country_ids = None
+		symptom_ids = None
+		
+		country_probability = 0
+		symptom_probability = 0
+		temperature_probability = 0
+		
+		if self.diagnostics["countries_visited"] != None and self.diagnostics["countries_visited"] != []:
+			country_ids = [country["id"] for country in self.diagnostics["countries_visited"]]
+			country_probability = get_country_probability(country_ids)["probability"]
+		
+		if self.diagnostics["symptoms"] != None and self.diagnostics["symptoms"] != []:
+			symptom_ids = [symptom["id"] for symptom in self.diagnostics["symptoms"]]
+			symptom_probability = get_symptom_probability(symptom_ids)["probability"]
+		
+		if(self.diagnostics["temperature"] != None):
+			if self.diagnostics["temperature"] > 37:
+				temperature_probability = 0.5
+			elif self.diagnostics["temperature"] > 40:
+				temperature_probability = 1
 
-		pass
+		# print("Country Probability {}".format(country_probability))
+		# print("Symptom Probability {}".format(symptom_probability))
+		# print("Temperature Probability {}".format(temperature_probability))
+		# print("---")
+		final_diagnosis = (country_probability + symptom_probability + temperature_probability) / 3
+		print("Overall {}%".format(int(final_diagnosis * 100)))
+
+	def submit_diagnosis(self):
+		self.name = self.name_input.get()
+		self.diagnose_patient()
+		
 	
 
 
