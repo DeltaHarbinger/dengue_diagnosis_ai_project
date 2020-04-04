@@ -15,25 +15,41 @@ router.get('/', (req, res) =>
 router.get('/probability', async (req, res) => {
 	let {countryIds} = req.body
 	let likelihood = 0
+	
+	if(!Array.isArray(countryIds)) {
+		if(countryIds === undefined){
+			countryIds = []
+		} else {
+			countryIds = [countryIds]
+		}
+	}
 
-	await Promise.all(countryIds.map(async countryId => {
-		let diagnosisCountries = await DiagnosisCountry.findAll({where: {countryId}})
-		let total = diagnosisCountries.length
-		let positive = 0
-		await Promise.all(diagnosisCountries.map(async dc => {
-			let diagnosis = await Diagnosis.findOne({where: {id: dc.diagnosisId}})
-			if(diagnosis.result > 50){
-				positive += 1
+	countryIds = countryIds.map(id => parseInt(id))
+
+	try{
+		await Promise.all(countryIds.map(async countryId => {
+		
+			let diagnosisCountries = await DiagnosisCountry.findAll({where: {countryId}})
+			let total = diagnosisCountries.length
+			let positive = 0.0
+			await Promise.all(diagnosisCountries.map(async dc => {
+				let diagnosis = await Diagnosis.findOne({where: {id: dc.diagnosisId}})
+				if(diagnosis.result > 50){
+					positive += 1
+				}
+			}))
+			if(total == 0) {
+				return
+			}
+			if(positive / parseFloat(total) > likelihood) {
+				likelihood = (positive / parseFloat(total))
 			}
 		}))
-		if(total == 0) {
-			return
-		}
-		if(positive / total > likelihood) {
-			likelihood = positive / total
-		}
-	}))
-	res.send({probability: likelihood})
+		res.send({probability: likelihood})
+	} catch(e) {
+		console.log(e)
+	}
+	
 })
 
 router.post('/', (req, res) => {
