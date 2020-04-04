@@ -59,7 +59,7 @@ def delete_symptom(id):
 	return response.json()
 
 def get_diagnosis(id):
-	print("{}/diagnoses?id={}".format(ROOT_URL, id))
+	id = str(id)
 	response = requests.get("{}/diagnoses?id={}".format(ROOT_URL, id))
 	return response.json()["diagnosis"]
 
